@@ -6,6 +6,7 @@ const serveStatic = require('serve-static')(`${__dirname}/static`, { index: ['in
 const app = require('http').createServer(
   (req, res) => serveStatic(req, res, handler(req, res)),
 );
+const io = require('socket.io')(app);
 
 app.listen(process.env.PORT);
 
@@ -31,3 +32,17 @@ function servePath(res, filePath) {
     },
   );
 }
+
+io.on('connection', (socket) => {
+  console.log('A user connected.');
+
+  //socket.emit('news', { hello: 'world' });
+
+  socket.on('x', (data) => {
+    console.log(data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected.');
+  });
+});
