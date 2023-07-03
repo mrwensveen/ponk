@@ -9,14 +9,15 @@
       width: 180px;
       height: 80px;
       border: 1px solid #ccc;
+      margin: 0 auto;
     }
 
     .paddle {
       position: absolute;
       top: 40px;
       left: 0px;
-      width: 1px;
-      height: 5px;
+      width: 2px;
+      height: 15px;
       background: green;
     }
   </style>
@@ -48,7 +49,7 @@
     function handleOrientation(event) {
       const landscape = window.screen.orientation.type.startsWith('landscape');
 
-      let rotation = (landscape ? event.beta : event.gamma) * 2;
+      let rotation = (landscape ? event.beta : event.gamma) * 3;
 
       let x = Math.floor(rotation / 10) * 10;
 
@@ -69,8 +70,8 @@
     }
 
     function handleMouse(event) {
-      //console.log(event);
-      let x = Math.floor(event.clientX / 10) * 10;
+      console.log(event);
+      let x = Math.floor(event.layerX / 10) * 10;
 
       displayPaddle(x);
     }
