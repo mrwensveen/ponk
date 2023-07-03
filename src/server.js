@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
 
     socket.on('move', (data) => {
       console.log(data);
-      display.emit('move', data);
+      display?.emit('move', data);
     });
 
     socket.on('disconnect', () => {
