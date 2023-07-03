@@ -8,19 +8,53 @@
 <body>
   <h1>Display</h1>
 
-  <pre class="output"></pre>
+  <div id="player1">
+    <div class="qr">
+      <p>Scan QR code to connect</p>
+      <div class="svg"></div>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <div id="player2">
+    <div class="qr">
+      <p>Scan QR code to connect</p>
+      <div class="svg"></div>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <script src="/js/qrcode.min.js"></script>
+  <script>
+    [1, 2].forEach((i) => {
+      var qrcode = new QRCode({
+        content: new URL(i, window.location.href).toString(),
+        container: "svg", //Responsive use
+        join: true //Crisp rendering and 4-5x reduced file size
+      });
+      var svg = qrcode.svg();
+      document.querySelector(`#player${i} .svg`).innerHTML = svg;
+    });
+  </script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io({ query: { role: 'display' } });
-    const output = document.querySelector(".output");
 
     let players = new Map();
 
-    socket.on('move', ({p, x}) => {
-      players.set(p, {p, x});
+    socket.on('move', (move) => {
+      const p = move.p.substring(1);
+      const x = move.x;
+
+      if (!players.has(p)) {
+        document.querySelector(`#player${p} .qr`).style.display = 'none';
+      }
+
+      players.set(p, { p, x });
 
       // TODO: Show the paddle visually
-      output.textContent = Array.from(players.entries()).reduce((s, [key, {_, x}]) => s + `${key}: ${x}\n`, '');
+      const output = document.querySelector(`#player${p} .output`);
+      output.textContent = x;
     });
   </script>
 </body>
