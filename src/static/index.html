@@ -7,6 +7,22 @@
 
 <body>
   <h1>Display</h1>
+
+  <pre class="output"></pre>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io({ query: { role: 'display' } });
+    const output = document.querySelector(".output");
+
+    let players = new Map();
+
+    socket.on('move', ({p, x}) => {
+      players.set(p, {p, x});
+
+      // TODO: Show the paddle visually
+      output.textContent = Array.from(players.entries()).reduce((s, [key, {_, x}]) => s + `${key}: ${x}\n`, '');
+    });
+  </script>
 </body>
 
 </html>

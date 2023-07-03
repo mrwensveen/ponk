@@ -33,16 +33,28 @@ function servePath(res, filePath) {
   );
 }
 
+let display = null;
 io.on('connection', (socket) => {
-  console.log('A user connected.');
+  console.log('A socket connected.', socket.handshake.query);
 
-  //socket.emit('news', { hello: 'world' });
+  if (socket.handshake.query.role === 'display') {
+    display = socket;
 
-  socket.on('x', (data) => {
-    console.log(data);
-  });
+    console.log('Display connected.');
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected.');
-  });
+    socket.on('disconnect', () => {
+      console.log('Display disconnected');
+    });
+  } else {
+    console.log('Player connected.');
+
+    socket.on('move', (data) => {
+      console.log(data);
+      display.emit('move', data);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('A user disconnected.');
+    });
+  }
 });

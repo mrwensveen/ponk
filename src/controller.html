@@ -32,7 +32,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    var socket = io();
+    const socket = io({ query: { role: 'player' } });
   </script>
   <script>
     const paddle = document.querySelector(".paddle");
@@ -43,6 +43,7 @@
     const maxY = garden.clientHeight - paddle.clientHeight;
 
     let x = 0;
+    let p = window.location.pathname;
 
     function handleOrientation(event) {
       const landscape = window.screen.orientation.type.startsWith('landscape');
@@ -84,7 +85,7 @@
 
       paddle.style.left = `${x}px`;
 
-      socket.emit('x', x);
+      socket.emit('move', { p, x });
     }
 
     window.addEventListener("deviceorientation", handleOrientation);
