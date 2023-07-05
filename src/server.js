@@ -43,7 +43,7 @@ let display = null;
 let players = [];
 
 io.on('connection', (socket) => {
-  console.log('A socket connected.', socket.handshake.query);
+  //console.log('A socket connected.', socket.handshake.query);
 
   if (socket.handshake.query.role === 'display') {
     console.log('Display connected.');
@@ -91,21 +91,23 @@ function startGame({ socket, game }) {
   function step() {
     if (!running) return;
 
-    game.step(Date.now());
+    const timestamp = Date.now();
 
+    game.step(timestamp);
     const render = game.render();
+
     //console.log(render);
     socket.emit('game', render);
 
-    running = setImmediate(step);
+    running = setTimeout(step, Game.perfectFameTime - (Date.now() - timestamp));
   }
 
-  running = setImmediate(step);
+  running = setTimeout(step, 0);
 }
 
 function stopGame(_) {
   if (running !== null) {
-    clearImmediate(running);
+    clearTimeout(running);
     running = null;
   }
 }
