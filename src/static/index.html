@@ -38,6 +38,10 @@
     <pre class="output"></pre>
   </div>
 
+  <div id="puck">
+    <pre class="output"></pre>
+  </div>
+
   <script src="/js/qrcode.min.js"></script>
   <script>
     [1, 2].forEach((i) => {
@@ -67,6 +71,7 @@
       // TODO: Show the puck and paddles visually
       document.querySelector('#player1 .output').textContent = game.p1;
       document.querySelector('#player2 .output').textContent = game.p2;
+      document.querySelector('#puck .output').textContent = `(${game.puck.x | 0}, ${game.puck.y | 0})`;
     });
   </script>
 </body>
