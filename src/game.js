@@ -6,6 +6,8 @@ class Game {
   p2;
 
   constructor(id, width, height) {
+    console.log('Game', id, width, height);
+
     this.id = id;
     this.width = width;
     this.height = height;
@@ -20,10 +22,20 @@ class Game {
   }
 
   step(timestamp) {
-    const deltaTime = this.#previousTimestamp ? (timestamp - this.#previousTimestamp) / this.perfectFrameTime : 0;
+    if (timestamp <= this.#previousTimestamp) return;
+
+    //console.log('step', this.#previousTimestamp, Game.perfectFrameTime, timestamp);
+    const deltaTime = this.#previousTimestamp ? (timestamp - this.#previousTimestamp) / Game.perfectFrameTime : 0;
     this.#previousTimestamp = timestamp;
 
     this.puck.update(deltaTime);
+
+    if (this.puck.pos.x <= 0 || this.puck.pos.x >= this.width) {
+      this.puck.bounce(Bounce.Vertical);
+    }
+    if (this.puck.pos.y <= 0 || this.puck.pos.y >= this.height) {
+      this.puck.bounce(Bounce.Horizontal);
+    }
   }
 
   render() {
@@ -42,6 +54,8 @@ class Puck {
   }
 
   bounce(direction, fa = 1, fv = 1) {
+    console.log('bounce', direction, fa, fv);
+
     if (direction === Bounce.Horizontal) {
       this.mov.y *= -1;
     } else if (direction === Bounce.Vertical) {
@@ -64,7 +78,7 @@ class Puck {
   }
 
   update(deltaTime) {
-    console.log(deltaTime);
+    //console.log(deltaTime);
     this.pos.x += this.mov.x * deltaTime;
     this.pos.y += this.mov.y * deltaTime;
   }
