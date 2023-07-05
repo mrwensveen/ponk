@@ -3,6 +3,16 @@
 
 <head>
   <title>Ponk</title>
+  <style>
+    .qr a {
+      display: block;
+    }
+
+    .qr a,
+    .svg {
+      width: fit-content;
+    }
+  </style>
 </head>
 
 <body>
@@ -11,7 +21,9 @@
   <div id="player1">
     <div class="qr">
       <p>Scan QR code to connect</p>
-      <div class="svg"></div>
+      <a href="/1" target="_blank">
+        <div class="svg"></div>
+      </a>
     </div>
     <pre class="output"></pre>
   </div>
@@ -19,7 +31,9 @@
   <div id="player2">
     <div class="qr">
       <p>Scan QR code to connect</p>
-      <div class="svg"></div>
+      <a href="/2" target="_blank">
+        <div class="svg"></div>
+      </a>
     </div>
     <pre class="output"></pre>
   </div>
@@ -38,23 +52,21 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io({ query: { role: 'display' } });
+    const socket = io({ query: { role: 'display', width: 800, height: 800 } });
 
-    let players = new Map();
+    let started = false;
 
-    socket.on('move', (move) => {
-      const p = move.p.substring(1);
-      const x = move.x;
+    socket.on('game', (game) => {
+      if (!started) {
+        document.querySelector('#player1 .qr').style.display = 'none';
+        document.querySelector('#player2 .qr').style.display = 'none';
 
-      if (!players.has(p)) {
-        document.querySelector(`#player${p} .qr`).style.display = 'none';
+        started = true;
       }
 
-      players.set(p, { p, x });
-
-      // TODO: Show the paddle visually
-      const output = document.querySelector(`#player${p} .output`);
-      output.textContent = x;
+      // TODO: Show the puck and paddles visually
+      document.querySelector('#player1 .output').textContent = game.p1;
+      document.querySelector('#player2 .output').textContent = game.p2;
     });
   </script>
 </body>

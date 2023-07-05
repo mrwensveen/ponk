@@ -8,9 +8,13 @@ const app = require('http').createServer(
 );
 const io = require('socket.io')(app);
 
+const { Game, Paddle } = require(`${__dirname}/game.js`);
+
 app.listen(process.env.PORT);
 
 console.log(`Server running on port ${process.env.PORT}`);
+
+// HTTP
 
 function handler(_req, res) {
   return () => {
@@ -33,28 +37,75 @@ function servePath(res, filePath) {
   );
 }
 
+// Socket.io and Game init
+
 let display = null;
+let players = [];
+
 io.on('connection', (socket) => {
   console.log('A socket connected.', socket.handshake.query);
 
   if (socket.handshake.query.role === 'display') {
-    display = socket;
-
     console.log('Display connected.');
+
+    var { width, height } = socket.handshake.query;
+    display = { socket, game: new Game(null, width, height) };
 
     socket.on('disconnect', () => {
       console.log('Display disconnected');
+
+      stopGame(display);
+      display = null;
     });
   } else {
     console.log('Player connected.');
 
+    const playerPaddle = new Paddle(socket.handshake.query.id, 0);
+    players.push(playerPaddle);
+
     socket.on('move', (data) => {
-      console.log(data);
-      display?.emit('move', data);
+      //console.log(data);
+
+      playerPaddle.x = data.x;
     });
 
     socket.on('disconnect', () => {
+      players = players.filter((p) => p.id !== playerPaddle.id);
+
       console.log('A user disconnected.');
     });
+
+    if (display && players.length === 2) {
+      display.game.p1 = players[0];
+      display.game.p2 = players[1];
+
+      startGame(display);
+    }
   }
 });
+
+// Game loop
+
+let running = null;
+function startGame({ socket, game }) {
+  function step() {
+    if (!running) return;
+
+    game.step(Date.now());
+
+    const render = game.render();
+    //console.log(render);
+    socket.emit('game', render);
+
+    running = setImmediate(step);
+  }
+
+  running = setImmediate(step);
+}
+
+function stopGame(_) {
+  if (running !== null) {
+    clearImmediate(running);
+    running = null;
+  }
+}

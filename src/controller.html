@@ -33,7 +33,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io({ query: { role: 'player' } });
+    const socket = io({ query: { role: 'player', id: window.location.pathname } });
   </script>
   <script>
     const paddle = document.querySelector(".paddle");
