@@ -35,11 +35,17 @@ class Game {
 
     this.puck.update(deltaTime);
 
-    if (this.puck.pos.x <= 0 || this.puck.pos.x >= this.width - 10) {
-      this.puck.bounce(Bounce.Vertical);
+    if (this.puck.pos.x <= 0) {
+      this.puck.mov.x = Math.abs(this.puck.mov.x);
     }
-    if (this.puck.pos.y <= 0 || this.puck.pos.y >= this.height - 10) {
-      this.puck.bounce(Bounce.Horizontal);
+    if (this.puck.pos.x >= this.width - 10) {
+      this.puck.mov.x = -1 * Math.abs(this.puck.mov.x)
+    }
+    if (this.puck.pos.y <= 0) {
+      this.puck.mov.y = Math.abs(this.puck.mov.y);
+    }
+    if (this.puck.pos.y >= this.height - 10) {
+      this.puck.mov.y = -1 * Math.abs(this.puck.mov.y)
     }
   }
 
