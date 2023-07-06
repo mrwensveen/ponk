@@ -92,21 +92,32 @@ function startGame({ socket, game }) {
     if (!running) return;
 
     const timestamp = Date.now();
+    //console.log(Game.perfectFrameTime, timestamp);
 
     game.step(timestamp);
     const render = game.render();
 
     //console.log(render);
-    socket.emit('game', render);
+    socket.emit('game', render, () => {
+      const renderTime = Date.now() - timestamp;
+      const delay = Game.perfectFrameTime - renderTime;
 
-    running = setTimeout(step, Game.perfectFameTime - (Date.now() - timestamp));
+      //console.log('game', ack, renderTime, delay)
+      running = setTimeout(step, delay);
+    });
+
+    //running = setImmediate(step);
+    //running = setTimeout(step, Game.perfectFrameTime - (Date.now() - timestamp));
+    //running = setTimeout(step, 20);
   }
 
+  //running = setImmediate(step, 0);
   running = setTimeout(step, 0);
 }
 
 function stopGame(_) {
   if (running !== null) {
+    //clearImmediate(running);
     clearTimeout(running);
     running = null;
   }

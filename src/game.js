@@ -1,5 +1,7 @@
 class Game {
-  static perfectFrameTime = 1000 / 30; // 30 fps
+  static fps = 60;
+  static perfectFrameTime = 1000 / Game.fps; // ms/f
+
   #previousTimestamp = 0;
 
   p1;
@@ -13,7 +15,8 @@ class Game {
     this.height = height;
 
     const angle = (.25 + Math.random() * .5) * Math.PI * (Math.random() >= .5 ? 1 : -1);
-    const vector = getVector(angle, 1);
+    const velocity = 300; // px/s
+    const vector = getVector(angle, velocity / Game.fps); // px/f
 
     this.puck = new Puck(
       { x: width / 2, y: height / 2 },
@@ -24,16 +27,18 @@ class Game {
   step(timestamp) {
     if (timestamp <= this.#previousTimestamp) return;
 
-    //console.log('step', this.#previousTimestamp, Game.perfectFrameTime, timestamp);
-    const deltaTime = this.#previousTimestamp ? (timestamp - this.#previousTimestamp) / Game.perfectFrameTime : 0;
+    const actualFrameTime = timestamp - this.#previousTimestamp;
+    const deltaTime = this.#previousTimestamp ? actualFrameTime / Game.perfectFrameTime : 0;
+    //console.log('step', Game.perfectFrameTime, actualFrameTime, deltaTime);
+
     this.#previousTimestamp = timestamp;
 
     this.puck.update(deltaTime);
 
-    if (this.puck.pos.x <= 0 || this.puck.pos.x >= this.width) {
+    if (this.puck.pos.x <= 0 || this.puck.pos.x >= this.width - 10) {
       this.puck.bounce(Bounce.Vertical);
     }
-    if (this.puck.pos.y <= 0 || this.puck.pos.y >= this.height) {
+    if (this.puck.pos.y <= 0 || this.puck.pos.y >= this.height - 10) {
       this.puck.bounce(Bounce.Horizontal);
     }
   }
@@ -54,7 +59,7 @@ class Puck {
   }
 
   bounce(direction, fa = 1, fv = 1) {
-    console.log('bounce', direction, fa, fv);
+    //console.log('bounce', direction, fa, fv);
 
     if (direction === Bounce.Horizontal) {
       this.mov.y *= -1;
@@ -96,8 +101,8 @@ const Bounce = Object.freeze({
   Vertical: "Vertical",
 });
 
-function getVector(angle, velocity) {
-  return { x: Math.cos(angle) * velocity, y: Math.sin(angle) * velocity };
+function getVector(angle, length) {
+  return { x: Math.cos(angle) * length, y: Math.sin(angle) * length };
 }
 
 module.exports = { Game, Paddle };
