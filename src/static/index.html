@@ -20,6 +20,8 @@
     #canvas {
       display: none;
       border: 1px solid grey;
+      border-width: 0 1px;
+      background-color: cyan;
     }
   </style>
 </head>
@@ -77,8 +79,8 @@
       canvas.fillStyle = 'black';
 
       canvas.fillRect(gameState.puck.x, gameState.puck.y, 10, 10);
-      canvas.fillRect(gameState.p1 / 180 * 700, 0, 100, 15);
-      canvas.fillRect(gameState.p2 / 180 * 700, 785, 100, 15);
+      canvas.fillRect(gameState.p1 / 180 * 700, 5, 100, 15);
+      canvas.fillRect(gameState.p2 / 180 * 700, 780, 100, 15);
 
       window.requestAnimationFrame(drawGameState);
     }
