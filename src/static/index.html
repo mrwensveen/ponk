@@ -66,9 +66,19 @@
     const socket = io({ query: { role: 'display', width: 800, height: 800 } });
 
     let canvas = null;
-    let rendering = false;
+    let gameState = null;
+
+    function drawGameState() {
+      canvas.clearRect(0, 0, 800, 800);
+      canvas.fillStyle = 'black';
+      canvas.fillRect(game.puck.x, game.puck.y, 10, 10);
+
+      window.requestAnimationFrame(drawGameState);
+    }
 
     socket.on('game', (game, ack) => {
+      gameState = game;
+
       if (!canvas) {
         document.querySelector('#player1 .qr').style.display = 'none';
         document.querySelector('#player2 .qr').style.display = 'none';
@@ -77,30 +87,16 @@
         canvasElement.style.display = 'block';
 
         canvas = canvasElement.getContext('2d');
-      }
 
-      if (rendering) {
-        console.log('drop');
-        return;
+        window.requestAnimationFrame(drawGameState);
       }
-
-      rendering = true;
 
       // TODO: Show the puck and paddles visually
       document.querySelector('#player1 .output').textContent = game.p1;
       document.querySelector('#player2 .output').textContent = game.p2;
       document.querySelector('#puck .output').textContent = `(${game.puck.x | 0}, ${game.puck.y | 0})`;
 
-      canvas.clearRect(0, 0, 800, 800);
-      canvas.fillStyle = 'black';
-      canvas.fillRect(game.puck.x, game.puck.y, 10, 10);
-      //canvas.fillRect(game.puck.x, game.puck.y, 5, 5);
-
-      rendering = false;
-
-      if (ack) {
-        window.requestAnimationFrame(() => ack("hey"));
-      }
+      ack?.call(null, "hey");
     });
   </script>
 </body>

@@ -98,16 +98,21 @@ function startGame({ socket, game }) {
     const render = game.render();
 
     //console.log(render);
-    socket.emit('game', render, () => {
-      const renderTime = Date.now() - timestamp;
-      const delay = Game.perfectFrameTime - renderTime;
+    socket.emit('game', render);
 
-      //console.log('game', ack, renderTime, delay)
-      running = setTimeout(step, delay);
-    });
+    //socket.emit('game', render, () => {
+    //  const renderTime = Date.now() - timestamp;
+    //  const delay = Game.perfectFrameTime - renderTime;
+
+    //  //console.log('game', ack, renderTime, delay)
+    //  running = setTimeout(step, delay);
+    //});
+
+    const renderTime = Date.now() - timestamp;
+    const delay = Game.perfectFrameTime - renderTime;
+    running = setTimeout(step, delay);
 
     //running = setImmediate(step);
-    //running = setTimeout(step, Game.perfectFrameTime - (Date.now() - timestamp));
     //running = setTimeout(step, 20);
   }
 
