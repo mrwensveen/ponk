@@ -36,17 +36,19 @@ class Game {
     this.puck.update(deltaTime);
 
     if (this.puck.pos.x <= 0) {
-      this.puck.mov.x = Math.abs(this.puck.mov.x);
+      this.puck.bounce(Bounce.Left);
     }
-    if (this.puck.pos.x >= this.width - 10) {
-      this.puck.mov.x = -1 * Math.abs(this.puck.mov.x)
+    if (this.puck.pos.x >= this.width - Puck.width) {
+      this.puck.bounce(Bounce.Right);
     }
-    if (this.puck.pos.y <= 0) {
-      this.puck.mov.y = Math.abs(this.puck.mov.y);
+    if (this.puck.pos.y <= Player.height) {
+      this.puck.bounce(Bounce.Top);
     }
-    if (this.puck.pos.y >= this.height - 10) {
-      this.puck.mov.y = -1 * Math.abs(this.puck.mov.y)
+    if (this.puck.pos.y >= this.height - Puck.height - Player.height) {
+      this.puck.bounce(Bounce.Bottom);
     }
+
+    return actualFrameTime;
   }
 
   render() {
@@ -59,18 +61,32 @@ class Game {
 }
 
 class Puck {
+  static width = 10;
+  static height = 10;
+
   constructor(pos, mov) {
     this.pos = pos;
     this.mov = mov;
   }
 
   bounce(direction, fa = 1, fv = 1) {
-    //console.log('bounce', direction, fa, fv);
+    //console.log('bounce', direction, fa, fv, this.pos, this.mov);
+    switch (direction) {
+      case Bounce.Top:
+        this.mov.y = Math.abs(this.mov.y);
+        break;
 
-    if (direction === Bounce.Horizontal) {
-      this.mov.y *= -1;
-    } else if (direction === Bounce.Vertical) {
-      this.mov.x *= -1;
+      case Bounce.Right:
+        this.mov.x = -1 * Math.abs(this.mov.x);
+        break;
+
+      case Bounce.Bottom:
+        this.mov.y = -1 * Math.abs(this.mov.y);
+        break;
+
+      case Bounce.Left:
+        this.mov.x = Math.abs(this.mov.x);
+        break;
     }
 
     // adjust angle and velocity by a factor
@@ -95,7 +111,10 @@ class Puck {
   }
 }
 
-class Paddle {
+class Player {
+  static height = 15;
+  score = 0;
+
   constructor(id, x) {
     this.id = id;
     this.x = x;
@@ -103,12 +122,14 @@ class Paddle {
 }
 
 const Bounce = Object.freeze({
-  Horizontal: "Horizontal",
-  Vertical: "Vertical",
+  Top: 'Top',
+  Right: 'Right',
+  Bottom: 'Bottom',
+  Left: 'Left',
 });
 
 function getVector(angle, length) {
   return { x: Math.cos(angle) * length, y: Math.sin(angle) * length };
 }
 
-module.exports = { Game, Paddle };
+module.exports = { Game, Player };
