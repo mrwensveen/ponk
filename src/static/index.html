@@ -4,6 +4,10 @@
 <head>
   <title>Ponk</title>
   <style>
+    body {
+      font-family: sans-serif;
+    }
+
     .qr a {
       display: block;
     }
@@ -21,7 +25,7 @@
 </head>
 
 <body>
-  <h1>Display</h1>
+  <h1>Ponk!</h1>
 
   <canvas id="canvas" width="800" height="800">Game area</canvas>
 
@@ -71,7 +75,10 @@
     function drawGameState() {
       canvas.clearRect(0, 0, 800, 800);
       canvas.fillStyle = 'black';
-      canvas.fillRect(game.puck.x, game.puck.y, 10, 10);
+
+      canvas.fillRect(gameState.puck.x, gameState.puck.y, 10, 10);
+      canvas.fillRect(gameState.p1 / 180 * 700, 0, 100, 15);
+      canvas.fillRect(gameState.p2 / 180 * 700, 785, 100, 15);
 
       window.requestAnimationFrame(drawGameState);
     }
