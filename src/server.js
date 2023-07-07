@@ -8,7 +8,7 @@ const app = require('http').createServer(
 );
 const io = require('socket.io')(app);
 
-const { Game, Paddle } = require(`${__dirname}/game.js`);
+const { Game, Player } = require(`${__dirname}/game.js`);
 
 app.listen(process.env.PORT);
 
@@ -60,17 +60,17 @@ io.on('connection', (socket) => {
   } else {
     console.log('Player connected.');
 
-    const playerPaddle = new Paddle(socket.handshake.query.id, 0);
-    players.push(playerPaddle);
+    const player = new Player(socket.handshake.query.id, 0);
+    players.push(player);
 
     socket.on('move', (data) => {
       //console.log(data);
 
-      playerPaddle.x = data.x;
+      player.x = data.x;
     });
 
     socket.on('disconnect', () => {
-      players = players.filter((p) => p.id !== playerPaddle.id);
+      players = players.filter((p) => p.id !== player.id);
 
       console.log('A user disconnected.');
     });
@@ -95,6 +95,7 @@ function startGame({ socket, game }) {
     //console.log(Game.perfectFrameTime, timestamp);
 
     game.step(timestamp);
+    //const frameTime = game.step(timestamp);
     const render = game.render();
 
     //console.log(render);
@@ -110,6 +111,8 @@ function startGame({ socket, game }) {
 
     const renderTime = Date.now() - timestamp;
     const delay = Game.perfectFrameTime - renderTime;
+
+    //const delay = 2 * Game.perfectFrameTime - frameTime;
     running = setTimeout(step, delay);
 
     //running = setImmediate(step);
