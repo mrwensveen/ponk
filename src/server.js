@@ -79,7 +79,10 @@ io.on('connection', (socket) => {
 
   if (display?.game && players.length === 2) {
     display.game.p1 = players.find(p => p.player.id === '/1').player;
+    display.game.p1.score = 0;
+
     display.game.p2 = players.find(p => p.player.id === '/2').player;
+    display.game.p2.score = 0;
 
     startGame(display);
   }
@@ -121,5 +124,5 @@ function stopGame(_) {
 
 function onScore(score) {
   display.socket.emit('score', score);
-  setTimeout(() => display.game?.start(), 1000);
+  setTimeout(() => display?.game.start(), 3000);
 }

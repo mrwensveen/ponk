@@ -33,7 +33,7 @@ class Game {
 
     this.puck.mov = vector;
 
-    console.log('game.start', angle, velocity, vector, this);
+    //console.log('game.start', angle, velocity, vector, this);
   }
 
   step(timestamp) {
@@ -52,24 +52,33 @@ class Game {
     if (this.puck.pos.x <= 0) {
       this.puck.bounce(Bounce.Left);
     }
+
     if (this.puck.pos.x >= this.width - Puck.width) {
       this.puck.bounce(Bounce.Right);
     }
 
-    //if (this.puck.pos.y <= Player.height && this.puck.pos.x >= this.p1.x && this.puck.x <= (this.p1.x + Player.width)) {
-    if (this.puck.pos.y <= Player.height) {
+    if (this.puck.pos.y <= Player.height
+      && this.puck.pos.x >= this.p1.x
+      && this.puck.pos.x <= (this.p1.x + Player.width)) {
       this.puck.bounce(Bounce.Top);
-
-      //if (this.puck.pos.x >= this.p1.x && this.puck.x <= this.p1.x + Player.width) {
-      //  this.puck.bounce(Bounce.Top);
-      //} else {
-      //  this.init();
-      //  this.p2.score++;
-      //  this.onScore(this.renderScore());
-      //}
     }
-    if (this.puck.pos.y >= this.height - Puck.height - Player.height) {
+    if (this.puck.pos.y <= 0) {
+      //console.log('score', this.puck.pos.y);
+      this.init();
+      this.p2.score++;
+      this.onScore(this.renderScore());
+    }
+
+    if (this.puck.pos.y + Puck.height >= this.height - Player.height
+      && this.puck.pos.x >= this.p2.x
+      && this.puck.pos.x <= (this.p2.x + Player.width)) {
       this.puck.bounce(Bounce.Bottom);
+    }
+    if (this.puck.pos.y + Puck.height >= this.height) {
+      //console.log('score', this.puck.pos.y);
+      this.init();
+      this.p1.score++;
+      this.onScore(this.renderScore());
     }
 
     return actualFrameTime;
@@ -141,7 +150,7 @@ class Puck {
 
 class Player {
   static width = 100;
-  static height = 15;
+  static height = 20;
   score = 0;
 
   constructor(id, x) {
