@@ -27,29 +27,31 @@
 </head>
 
 <body>
-  <h1>Ponk!</h1>
+  <div id="lobby">
+    <h1>Ponk!</h1>
+
+    <div id="player1">
+      <div class="qr">
+        <p>Scan QR code to connect</p>
+        <a href="/1" target="_blank">
+          <div class="svg"></div>
+        </a>
+      </div>
+      <pre class="output"></pre>
+    </div>
+
+    <div id="player2">
+      <div class="qr">
+        <p>Scan QR code to connect</p>
+        <a href="/2" target="_blank">
+          <div class="svg"></div>
+        </a>
+      </div>
+      <pre class="output"></pre>
+    </div>
+  </div>
 
   <canvas id="canvas" width="800" height="800">Game area</canvas>
-
-  <div id="player1">
-    <div class="qr">
-      <p>Scan QR code to connect</p>
-      <a href="/1" target="_blank">
-        <div class="svg"></div>
-      </a>
-    </div>
-    <pre class="output"></pre>
-  </div>
-
-  <div id="player2">
-    <div class="qr">
-      <p>Scan QR code to connect</p>
-      <a href="/2" target="_blank">
-        <div class="svg"></div>
-      </a>
-    </div>
-    <pre class="output"></pre>
-  </div>
 
   <div id="puck">
     <pre class="output"></pre>
@@ -104,8 +106,7 @@
       gameState = game;
 
       if (!canvas) {
-        document.querySelector('#player1 .qr').style.display = 'none';
-        document.querySelector('#player2 .qr').style.display = 'none';
+        document.querySelector('#lobby').style.display = 'none';
 
         const canvasElement = document.getElementById('canvas');
         canvasElement.style.display = 'block';

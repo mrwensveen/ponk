@@ -49,21 +49,24 @@ class Game {
 
     this.puck.update(deltaTime);
 
-    if (this.puck.pos.x <= 0) {
+    if (this.puck.pos.x <= 0 && this.puck.mov.x < 0) {
       this.puck.bounce(Bounce.Left);
     }
 
-    if (this.puck.pos.x + Puck.width >= this.width) {
+    if (this.puck.pos.x + Puck.width >= this.width && this.puck.mov.x > 0) {
       this.puck.bounce(Bounce.Right);
     }
 
     if (this.puck.pos.y <= Player.height
       && this.puck.pos.x + Puck.width >= this.p1.x
-      && this.puck.pos.x <= (this.p1.x + Player.width)) {
-      this.puck.bounce(Bounce.Top);
+      && this.puck.pos.x <= (this.p1.x + Player.width)
+      && this.puck.mov.y < 0
+    ) {
+      const [fa, fv] = getBounceAdjustment(this.puck, this.p1);
+      this.puck.bounce(Bounce.Top, fa, fv);
+      //this.puck.bounce(Bounce.Top);
     }
     if (this.puck.pos.y <= 0) {
-      //console.log('score', this.puck.pos.y);
       this.init();
       this.p2.score++;
       this.onScore(this.renderScore());
@@ -71,11 +74,14 @@ class Game {
 
     if (this.puck.pos.y + Puck.height >= this.height - Player.height
       && this.puck.pos.x + Puck.width >= this.p2.x
-      && this.puck.pos.x <= (this.p2.x + Player.width)) {
-      this.puck.bounce(Bounce.Bottom);
+      && this.puck.pos.x <= (this.p2.x + Player.width)
+      && this.puck.mov.y > 0
+    ) {
+      const [fa, fv] = getBounceAdjustment(this.puck, this.p2);
+      this.puck.bounce(Bounce.Bottom, fa, fv);
+      //this.puck.bounce(Bounce.Bottom);
     }
     if (this.puck.pos.y + Puck.height >= this.height) {
-      //console.log('score', this.puck.pos.y);
       this.init();
       this.p1.score++;
       this.onScore(this.renderScore());
@@ -106,39 +112,44 @@ class Puck {
     this.mov = mov;
   }
 
-  bounce(direction, fa = 1, fv = 1) {
-    //console.log('bounce', direction, fa, fv, this.pos, this.mov);
-    switch (direction) {
-      case Bounce.Top:
-        this.mov.y = Math.abs(this.mov.y);
-        break;
+  bounce(direction, fa = 0, fv = 0) {
+    const currentAngle = Math.atan2(this.mov.y, this.mov.x);
 
-      case Bounce.Right:
-        this.mov.x = -1 * Math.abs(this.mov.x);
-        break;
+    const refractionAngle = ((d, f) => {
+      switch (d) {
+        case Bounce.Bottom:
+          return 0 + f;
 
-      case Bounce.Bottom:
-        this.mov.y = -1 * Math.abs(this.mov.y);
-        break;
+        case Bounce.Left:
+          return .5 * Math.PI;
 
-      case Bounce.Left:
-        this.mov.x = Math.abs(this.mov.x);
-        break;
-    }
+        case Bounce.Top:
+          return Math.PI - f;
 
-    // adjust angle and velocity by a factor
-    if (fa != 1 || fv != 1) {
-      const v = Math.sqrt(this.mov.x ** 2 + this.mov.y ** 2);
+        case Bounce.Right:
+          return 1.5 * Math.PI;
 
-      if (fa != 1) {
-        const a = Math.acos(this.mov.x / v);
-        this.mov = getVector(a * fa, v);
       }
-      if (fv != 1) {
-        this.mov.x *= fv;
-        this.mov.y *= fv;
-      }
-    }
+    })(direction, fa);
+
+    const v = (1 + fv) * Math.sqrt(this.mov.x ** 2 + this.mov.y ** 2);
+    const a = 2 * refractionAngle - currentAngle;
+
+    this.mov = getVector(a, v);
+
+
+    // adjust angle
+    //if (fa != 1) {
+    //  const v = Math.sqrt(this.mov.x ** 2 + this.mov.y ** 2);
+    //  const a = Math.atan2(this.mov.y, this.mov.x);
+
+    //  this.mov = getVector((a + fa) / 2, v);
+    //}
+
+    //if (fv != 1) {
+    //  this.mov.x *= fv;
+    //  this.mov.y *= fv;
+    //}
   }
 
   update(deltaTime) {
@@ -168,6 +179,14 @@ const Bounce = Object.freeze({
 
 function getVector(angle, length) {
   return { x: Math.cos(angle) * length, y: Math.sin(angle) * length };
+}
+
+function getBounceAdjustment(puck, player) {
+  // Between 0 and 1
+  const b = (puck.pos.x + Puck.width - player.x) / (Player.width + Puck.width);
+
+  // Between
+  return [Math.PI * (b / 4 - .125), b / 10];
 }
 
 module.exports = { Game, Player };
