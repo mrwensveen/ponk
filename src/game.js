@@ -53,12 +53,12 @@ class Game {
       this.puck.bounce(Bounce.Left);
     }
 
-    if (this.puck.pos.x >= this.width - Puck.width) {
+    if (this.puck.pos.x + Puck.width >= this.width) {
       this.puck.bounce(Bounce.Right);
     }
 
     if (this.puck.pos.y <= Player.height
-      && this.puck.pos.x >= this.p1.x
+      && this.puck.pos.x + Puck.width >= this.p1.x
       && this.puck.pos.x <= (this.p1.x + Player.width)) {
       this.puck.bounce(Bounce.Top);
     }
@@ -70,7 +70,7 @@ class Game {
     }
 
     if (this.puck.pos.y + Puck.height >= this.height - Player.height
-      && this.puck.pos.x >= this.p2.x
+      && this.puck.pos.x + Puck.width >= this.p2.x
       && this.puck.pos.x <= (this.p2.x + Player.width)) {
       this.puck.bounce(Bounce.Bottom);
     }
