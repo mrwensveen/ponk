@@ -51,7 +51,7 @@
 
       let rotation = (landscape ? event.beta : event.gamma) * 3;
 
-      let x = Math.floor(rotation / 10) * 10;
+      let x = Math.floor(rotation / 5) * 5;
 
       // Because we don't want to have the device upside down
       // We constrain the x value to the range [-90,90]
@@ -70,10 +70,10 @@
     }
 
     function handleMouse(event) {
-      console.log(event);
-      let x = Math.floor(event.layerX / 10) * 10;
-
-      handleMove(x);
+      if (event.target === garden) {
+        let x = Math.floor(event.layerX / 5) * 5;
+        handleMove(x);
+      }
     }
 
     function handleMove(x) {

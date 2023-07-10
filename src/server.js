@@ -72,8 +72,8 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       console.log('Player disconnected.');
 
+      players = players.filter((p) => p.player.id !== player.player.id);
       stopGame(display);
-      players = players.filter((p) => p.id !== player.player.id);
     });
   }
 
