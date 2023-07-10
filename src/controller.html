@@ -66,17 +66,17 @@
       // x and y to [0,180]
       x += 90;
 
-      displayPaddle(x);
+      handleMove(x);
     }
 
     function handleMouse(event) {
       console.log(event);
       let x = Math.floor(event.layerX / 10) * 10;
 
-      displayPaddle(x);
+      handleMove(x);
     }
 
-    function displayPaddle(x) {
+    function handleMove(x) {
       if (window.x === x) return;
 
       window.x = x;
@@ -86,7 +86,8 @@
 
       paddle.style.left = `${x}px`;
 
-      socket.emit('move', { p, x });
+      // Send value between 0 and 1
+      socket.emit('move', { p, x: x / 180 });
     }
 
     window.addEventListener("deviceorientation", handleOrientation);

@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
     console.log('Display connected.');
 
     var { width, height } = socket.handshake.query;
-    display = { socket, game: new Game(null, width, height) };
+    display = { socket, game: new Game(null, width, height, onScore) };
 
     socket.on('disconnect', () => {
       console.log('Display disconnected');
@@ -60,27 +60,28 @@ io.on('connection', (socket) => {
   } else {
     console.log('Player connected.');
 
-    const player = new Player(socket.handshake.query.id, 0);
+    const player = { socket, player: new Player(socket.handshake.query.id, 0) };
     players.push(player);
 
     socket.on('move', (data) => {
-      //console.log(data);
+      //console.log(player.player.x, data.x, display.game.width, Player.width);
 
-      player.x = data.x;
+      player.player.x = data.x * (display.game.width - Player.width);
     });
 
     socket.on('disconnect', () => {
-      players = players.filter((p) => p.id !== player.id);
+      console.log('Player disconnected.');
 
-      console.log('A user disconnected.');
+      stopGame(display);
+      players = players.filter((p) => p.id !== player.player.id);
     });
+  }
 
-    if (display && players.length === 2) {
-      display.game.p1 = players[0];
-      display.game.p2 = players[1];
+  if (display?.game && players.length === 2) {
+    display.game.p1 = players.find(p => p.player.id === '/1').player;
+    display.game.p2 = players.find(p => p.player.id === '/2').player;
 
-      startGame(display);
-    }
+    startGame(display);
   }
 });
 
@@ -88,45 +89,37 @@ io.on('connection', (socket) => {
 
 let running = null;
 function startGame({ socket, game }) {
+  console.log('startGame');
+
   function step() {
     if (!running) return;
 
     const timestamp = Date.now();
-    //console.log(Game.perfectFrameTime, timestamp);
-
     game.step(timestamp);
-    //const frameTime = game.step(timestamp);
-    const render = game.render();
+
+    const render = game.renderGame();
 
     //console.log(render);
     socket.emit('game', render);
 
-    //socket.emit('game', render, () => {
-    //  const renderTime = Date.now() - timestamp;
-    //  const delay = Game.perfectFrameTime - renderTime;
-
-    //  //console.log('game', ack, renderTime, delay)
-    //  running = setTimeout(step, delay);
-    //});
-
     const renderTime = Date.now() - timestamp;
     const delay = Game.perfectFrameTime - renderTime;
 
-    //const delay = 2 * Game.perfectFrameTime - frameTime;
     running = setTimeout(step, delay);
-
-    //running = setImmediate(step);
-    //running = setTimeout(step, 20);
   }
 
-  //running = setImmediate(step, 0);
+  setTimeout(() => game.start(), 1000);
   running = setTimeout(step, 0);
 }
 
 function stopGame(_) {
   if (running !== null) {
-    //clearImmediate(running);
     clearTimeout(running);
     running = null;
   }
+}
+
+function onScore(score) {
+  display.socket.emit('score', score);
+  setTimeout(() => display.game?.start(), 1000);
 }

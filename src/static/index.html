@@ -79,13 +79,14 @@
       canvas.fillStyle = 'black';
 
       canvas.fillRect(gameState.puck.x, gameState.puck.y, 10, 10);
-      canvas.fillRect(gameState.p1 / 180 * 700, 5, 100, 15);
-      canvas.fillRect(gameState.p2 / 180 * 700, 780, 100, 15);
+      canvas.fillRect(gameState.p1, 5, 100, 15);
+      canvas.fillRect(gameState.p2, 780, 100, 15);
 
       window.requestAnimationFrame(drawGameState);
     }
 
     socket.on('game', (game, ack) => {
+      //console.log(game);
       gameState = game;
 
       if (!canvas) {
@@ -100,12 +101,11 @@
         window.requestAnimationFrame(drawGameState);
       }
 
-      // TODO: Show the puck and paddles visually
       document.querySelector('#player1 .output').textContent = game.p1;
       document.querySelector('#player2 .output').textContent = game.p2;
       document.querySelector('#puck .output').textContent = `(${game.puck.x | 0}, ${game.puck.y | 0})`;
 
-      ack?.call(null, "hey");
+      ack?.call(null, "ack");
     });
   </script>
 </body>
