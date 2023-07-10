@@ -64,9 +64,9 @@ io.on('connection', (socket) => {
     players.push(player);
 
     socket.on('move', (data) => {
-      //console.log(player.player.x, data.x, display.game.width, Player.width);
-
-      player.player.x = data.x * (display.game.width - Player.width);
+      if (display) {
+        player.player.x = data.x * (display.game.width - Player.width);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -111,6 +111,7 @@ function startGame({ socket, game }) {
     running = setTimeout(step, delay);
   }
 
+  socket.emit('score', { p1: game.p1.score, p2: game.p2.score });
   setTimeout(() => game.start(), 1000);
   running = setTimeout(step, 0);
 }
@@ -124,5 +125,15 @@ function stopGame(_) {
 
 function onScore(score) {
   display.socket.emit('score', score);
-  setTimeout(() => display?.game.start(), 3000);
+
+  if (score.p1 === 5 || score.p2 === 5) {
+    // Game over
+
+    players.forEach(p => p.player.score = 0);
+
+    setTimeout(() => display?.socket.emit('score', display?.game.renderScore()), 3000);
+    setTimeout(() => display?.game.start(), 6000);
+  } else {
+    setTimeout(() => display?.game.start(), 3000);
+  }
 }
