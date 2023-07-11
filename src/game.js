@@ -6,15 +6,17 @@ class Game {
 
   p1;
   p2;
-  onScore = () => { }
+  onScore;
+  onBounce;
 
-  constructor(id, width, height, onScore) {
+  constructor(id, width, height, onScore = () => { }, onBounce = () => { }) {
     console.log('Game', id, width, height);
 
     this.id = id;
     this.width = width;
     this.height = height;
     this.onScore = onScore;
+    this.onBounce = onBounce;
 
     this.init();
   }
@@ -50,10 +52,12 @@ class Game {
     this.puck.update(deltaTime);
 
     if (this.puck.pos.x <= 0 && this.puck.mov.x < 0) {
+      this.onBounce(Bounce.Left);
       this.puck.bounce(Bounce.Left);
     }
 
     if (this.puck.pos.x + Puck.width >= this.width && this.puck.mov.x > 0) {
+      this.onBounce(Bounce.Right);
       this.puck.bounce(Bounce.Right);
     }
 
@@ -62,9 +66,10 @@ class Game {
       && this.puck.pos.x <= (this.p1.x + Player.width)
       && this.puck.mov.y < 0
     ) {
+      this.onBounce(Bounce.Top);
+
       const [fa, fv] = getBounceAdjustment(this.puck, this.p1);
       this.puck.bounce(Bounce.Top, fa, fv);
-      //this.puck.bounce(Bounce.Top);
     }
     if (this.puck.pos.y <= 0) {
       this.init();
@@ -77,9 +82,10 @@ class Game {
       && this.puck.pos.x <= (this.p2.x + Player.width)
       && this.puck.mov.y > 0
     ) {
+      this.onBounce(Bounce.Bottom);
+
       const [fa, fv] = getBounceAdjustment(this.puck, this.p2);
       this.puck.bounce(Bounce.Bottom, fa, fv);
-      //this.puck.bounce(Bounce.Bottom);
     }
     if (this.puck.pos.y + Puck.height >= this.height) {
       this.init();

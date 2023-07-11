@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
     console.log('Display connected.');
 
     var { width, height } = socket.handshake.query;
-    display = { socket, game: new Game(null, width, height, onScore) };
+    display = { socket, game: new Game(null, width, height, onScore, onBounce) };
 
     socket.on('disconnect', () => {
       console.log('Display disconnected');
@@ -136,4 +136,8 @@ function onScore(score) {
   } else {
     setTimeout(() => display?.game.start(), 3000);
   }
+}
+
+function onBounce(direction) {
+  display.socket.emit('bounce', direction);
 }

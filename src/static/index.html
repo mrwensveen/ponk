@@ -17,6 +17,10 @@
       width: fit-content;
     }
 
+    #lobby {
+      display: none;
+    }
+
     #canvas {
       display: none;
       border: 1px solid grey;
@@ -27,6 +31,8 @@
 </head>
 
 <body>
+  <button id="paddleSound">Play Ponk!</button>
+
   <div id="lobby">
     <h1>Ponk!</h1>
 
@@ -37,7 +43,6 @@
           <div class="svg"></div>
         </a>
       </div>
-      <pre class="output"></pre>
     </div>
 
     <div id="player2">
@@ -47,16 +52,36 @@
           <div class="svg"></div>
         </a>
       </div>
-      <pre class="output"></pre>
     </div>
   </div>
 
   <canvas id="canvas" width="800" height="800">Game area</canvas>
 
-  <div id="puck">
-    <pre class="output"></pre>
-  </div>
+  <script>
+    const audio = new window.AudioContext();
 
+    function playSound(frequency, duration) {
+      const noise = audio.createOscillator();
+      noise.frequency.value = frequency;
+      noise.type = "square";
+
+      const gain = audio.createGain();
+      gain.gain.value = .5;
+
+      noise
+        .connect(gain)
+        .connect(audio.destination);
+      noise.start();
+      noise.stop(audio.currentTime + duration);
+    }
+
+    document.querySelector("#paddleSound")
+      .addEventListener("click", (event) => {
+        console.log(event);
+        playSound(491, 0.016);
+      });
+
+  </script>
   <script src="/js/qrcode.min.js"></script>
   <script>
     [1, 2].forEach((i) => {
@@ -101,8 +126,7 @@
       window.requestAnimationFrame(drawGameState);
     }
 
-    socket.on('game', (game, ack) => {
-      //console.log(game);
+    socket.on('game', (game) => {
       gameState = game;
 
       if (!canvas) {
@@ -116,15 +140,20 @@
 
         window.requestAnimationFrame(drawGameState);
       }
-
-      document.querySelector('#player1 .output').textContent = score?.p1;
-      document.querySelector('#player2 .output').textContent = score?.p2;
-      document.querySelector('#puck .output').textContent = `(${game.puck.x | 0}, ${game.puck.y | 0})`;
-
-      ack?.call(null, "ack");
     });
 
-    socket.on('score', s => score = s);
+    socket.on('score', s => {
+      score = s;
+      playSound(246, 0.220);
+    });
+
+    socket.on('bounce', d => {
+      if (d === 'Top' || d === 'Bottom') {
+        playSound(491, 0.016);
+      } else {
+        playSound(246, 0.016);
+      }
+    });
   </script>
 </body>
 
