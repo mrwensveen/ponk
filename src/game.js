@@ -186,7 +186,7 @@ function getBounceAdjustment(puck, player) {
   const b = (puck.pos.x + Puck.width - player.x) / (Player.width + Puck.width);
 
   // Between
-  return [Math.PI * (b / 4 - .125), b / 10];
+  return [Math.PI * (b / 4 - .125), Math.abs(b - .5) / 10];
 }
 
 module.exports = { Game, Player };
