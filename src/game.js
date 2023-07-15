@@ -23,7 +23,7 @@ class Game {
 
   init() {
     this.puck = new Puck(
-      { x: this.width / 2, y: this.height / 2 },
+      { x: this.width / 2 - Puck.width / 2, y: this.height / 2 - Puck.height / 2 },
       { x: 0, y: 0 },
     );
   }
@@ -119,6 +119,8 @@ class Puck {
   }
 
   bounce(direction, fa = 0, fv = 0) {
+    // TODO: constrain angles to prevent (almost) horizontal bounces
+
     const currentAngle = Math.atan2(this.mov.y, this.mov.x);
 
     const refractionAngle = ((d, f) => {

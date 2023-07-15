@@ -17,22 +17,20 @@
       width: fit-content;
     }
 
-    #lobby {
+    /*#lobby {
       display: none;
-    }
+    }*/
 
     #canvas {
       display: none;
       border: 1px solid grey;
       border-width: 0 1px;
-      background-color: cyan;
+      background-color: black;
     }
   </style>
 </head>
 
 <body>
-  <button id="paddleSound">Play Ponk!</button>
-
   <div id="lobby">
     <h1>Ponk!</h1>
 
@@ -74,13 +72,6 @@
       noise.start();
       noise.stop(audio.currentTime + duration);
     }
-
-    document.querySelector("#paddleSound")
-      .addEventListener("click", (event) => {
-        console.log(event);
-        playSound(491, 0.016);
-      });
-
   </script>
   <script src="/js/qrcode.min.js"></script>
   <script>
@@ -113,12 +104,21 @@
       canvas.clearRect(0, 0, 800, 800);
 
       if (score && numberSprites) {
-        canvas.drawImage(numberSprites, score.p1 * 5, 0, 5, 5, 375, 200, 50, 50);
-        canvas.drawImage(numberSprites, score.p2 * 5, 0, 5, 5, 375, 600, 50, 50);
+        canvas.save();
+        canvas.globalAlpha = 0.4;
+        canvas.drawImage(numberSprites, score.p1 * 5, 0, 5, 5, 25, 200, 50, 50);
+        canvas.drawImage(numberSprites, score.p2 * 5, 0, 5, 5, 25, 600, 50, 50);
+        canvas.restore();
       }
 
-      canvas.fillStyle = 'black';
+      canvas.strokeStyle = 'white';
+      canvas.beginPath();
+      canvas.moveTo(0, 400);
+      canvas.lineTo(800, 400)
+      canvas.setLineDash([10, 10]);
+      canvas.stroke();
 
+      canvas.fillStyle = 'white';
       canvas.fillRect(gameState.puck.x, gameState.puck.y, 10, 10);
       canvas.fillRect(gameState.p1, 5, 100, 15);
       canvas.fillRect(gameState.p2, 780, 100, 15);
