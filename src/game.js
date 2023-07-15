@@ -119,8 +119,6 @@ class Puck {
   }
 
   bounce(direction, fa = 0, fv = 0) {
-    // TODO: constrain angles to prevent (almost) horizontal bounces
-
     const currentAngle = Math.atan2(this.mov.y, this.mov.x);
 
     const refractionAngle = ((d, f) => {
@@ -141,23 +139,20 @@ class Puck {
     })(direction, fa);
 
     const v = (1 + fv) * Math.sqrt(this.mov.x ** 2 + this.mov.y ** 2);
-    const a = 2 * refractionAngle - currentAngle;
+    let a = mod(2 * refractionAngle - currentAngle, 2 * Math.PI);
+
+    console.log(a);
+
+    // Constrain angles to prevent (almost) horizontal bounces
+    a = Math.max(a, Math.PI * .125);
+
+    a = a < Math.PI
+      ? Math.min(a, Math.PI * .875)
+      : Math.max(a, Math.PI * 1.125);
+
+    a = Math.min(a, Math.PI * 1.875);
 
     this.mov = getVector(a, v);
-
-
-    // adjust angle
-    //if (fa != 1) {
-    //  const v = Math.sqrt(this.mov.x ** 2 + this.mov.y ** 2);
-    //  const a = Math.atan2(this.mov.y, this.mov.x);
-
-    //  this.mov = getVector((a + fa) / 2, v);
-    //}
-
-    //if (fv != 1) {
-    //  this.mov.x *= fv;
-    //  this.mov.y *= fv;
-    //}
   }
 
   update(deltaTime) {
@@ -195,6 +190,10 @@ function getBounceAdjustment(puck, player) {
 
   // Between
   return [Math.PI * (b / 4 - .125), Math.abs(b - .5) / 10];
+}
+
+function mod(x, m) {
+  return ((x % m) + m) % m;
 }
 
 module.exports = { Game, Player };
